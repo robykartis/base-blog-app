@@ -17,8 +17,10 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('username')->unique();
             $table->string('role')->default('user');
-            $table->string('profile_photo_path', 2048)->nullable();
-            $table->string('profile_photo_url')->nullable();
+            $table->string('profile_photo_path')->nullable();
+            $table->string('profile_photo_path_url')->nullable();
+            $table->string('profile_photo_thumbnail_path')->nullable();
+            $table->string('profile_photo_thumbnail_url')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->uuid('created_by')->nullable();

@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Intervention\Image\Laravel\Facades\Image;
 
 class AuthController extends Controller
 {
@@ -44,7 +45,8 @@ class AuthController extends Controller
             'username' => $request->username,
             'password' => Hash::make($request->password),
             'role' => 'user',
-            'profile_photo_url' => 'assets/image/user/',
+            'profile_photo_path_url' => 'assets/image/user/',
+            'profile_photo_thumbnail_url' => 'assets/image/user/thumbnail/',
         ]);
         $user['created_by'] = $user->id;
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -58,6 +60,21 @@ class AuthController extends Controller
     }
     public function login(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required|min:3',
+        ], [
+            'emaill.required' => 'Email is required',
+            'password.required' => 'Password is required',
+            'password.min' => 'Password must be at least 3 characters',
+
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()
+            ], 401);
+        }
         $credentials = $request->only('email', 'password');
         if (!Auth::attempt($credentials)) {
             return response()->json([
@@ -104,7 +121,6 @@ class AuthController extends Controller
             'password' => 'nullable|min:6',
             'c_password' => 'nullable|same:password',
             'profile_photo_path' => 'nullable|mimes:jpg,jpeg,png|max:2048',
-            'profile_photo_url' => 'nullable',
         ], [
             'name.required' => 'Name is required',
             'email.required' => 'Email is required',
@@ -152,14 +168,27 @@ class AuthController extends Controller
                 }
             }
         }
+        $image = Image::read($request->file('profile_photo_path'));
+
+        // Main Image Upload on Folder Code
+        $imageName = time() . '-' . $request->file('profile_photo_path')->getClientOriginalName();
+        $destinationPath = public_path('assets/image/user/');
+        $image->save($destinationPath . $imageName);
+
+        // Generate Thumbnail Image Upload on Folder Code
+        $destinationPathThumbnail = public_path('assets/image/user/thumbnail/');
+        $image->resize(100, 100);
+        $image->save($destinationPathThumbnail . $imageName);
 
         $user =  User::where('id', $user->id)->update([
             'name' => $request->name,
             'email' => $request->email,
             'username' => $request->username,
             'password' => Hash::make($request->password),
-            'profile_photo_path' => $request->profile_photo_path,
-            'profile_photo_url' => 'assets/image/user/',
+            'profile_photo_path' => $imageName,
+            'profile_photo_thumbnail_path' => $imageName,
+            'profile_photo_path_url' => 'assets/image/user/',
+            'profile_photo_thumbnail_url' => 'assets/image/user/thumbnail/',
             'role' => 'user',
             'updated_by' => Auth::user()->id
         ]);

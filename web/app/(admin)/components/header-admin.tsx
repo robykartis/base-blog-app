@@ -11,14 +11,7 @@ import {
     ShoppingCart,
     Users2,
 } from "lucide-react"
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
+
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
@@ -34,7 +27,7 @@ import { ModeToggle } from "@/components/theme-toggle"
 import { useState } from "react"
 import { CustomSession, CustomUser } from "@/app/api/auth/[...nextauth]/options"
 import { signOut, useSession } from "next-auth/react"
-import { LOGOUT_URL } from '@/lib/ApiURL'
+import { DETAIL_USER_URL, IMAGE_URL, LOGOUT_URL } from '@/lib/ApiURL'
 import axios from "@/lib/axios"
 import { toast } from '@/components/ui/use-toast'
 import {
@@ -47,18 +40,50 @@ import {
 } from "@/components/ui/dialog"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Drawer } from "@/components/ui/drawer"
+import DrawerUpdate from "./user-update"
+import BreadcrumbComponent from "./breadcrumb"
+import { getUserDetail } from "@/app/api/Admin/User"
 
 const HeaderAdmin = () => {
 
     const [logoutOpen, setLogOutOpen] = useState(false);
     const [loading, setLoading] = useState<boolean>(true);
+    const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+    const [drawerData, setDrawerData] = useState(null);
 
+    console.log(drawerData);
     const { data } = useSession();
     const userSession = data as CustomSession;
     // console.log(userSession);
     const { access_token, token_type } = userSession?.user || {};
     // console.log(access_token, token_type);
     const userData: any = userSession?.user?.data || {};
+    console.log(userData);
+    const handleUpdateFinish = () => {
+        setDrawerOpen(false); // Menutup Drawer setelah berhasil mengirimkan data update
+    };
+    const handleOpenDrawer = async () => {
+        try {
+            const { url, id, type_token, tokens } = {
+                url: DETAIL_USER_URL,
+                id: userData.id,
+                tokens: access_token,
+                type_token: token_type,
+            };
+            const res = await getUserDetail({ url, id, tokens, type_token });
+            // console.log(res);
+            setDrawerData(res.data);
+            setDrawerOpen(true);
+        } catch (error: any) {
+            toast({
+                variant: "destructive",
+                title: 'Error',
+                description: error.response?.data.message,
+                duration: 5000
+            });
+        }
+    };
 
     const logoutUser = async () => {
         setLoading(true);
@@ -148,25 +173,9 @@ const HeaderAdmin = () => {
                         </nav>
                     </SheetContent>
                 </Sheet>
-                <Breadcrumb className="hidden md:flex">
-                    <BreadcrumbList>
-                        <BreadcrumbItem>
-                            <BreadcrumbLink asChild>
-                                <Link href="#">Dashboard</Link>
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator />
-                        <BreadcrumbItem>
-                            <BreadcrumbLink asChild>
-                                <Link href="#">Orders</Link>
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator />
-                        <BreadcrumbItem>
-                            <BreadcrumbPage>Recent Orders</BreadcrumbPage>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
+
+                <BreadcrumbComponent />
+
                 <div className="relative ml-auto flex-1 md:grow-0">
 
                     <ModeToggle />
@@ -179,7 +188,7 @@ const HeaderAdmin = () => {
                             className="overflow-hidden rounded-full"
                         >
                             <Avatar>
-                                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                                <AvatarImage src={`${IMAGE_URL}${userData.profile_photo_thumbnail_url}${userData.profile_photo_thumbnail_path}`} alt={userData.name} />
                                 <AvatarFallback>{userData.name}</AvatarFallback>
                             </Avatar>
                         </Button>
@@ -187,12 +196,19 @@ const HeaderAdmin = () => {
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>{userData.name}</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>Settings</DropdownMenuItem>
-                        <DropdownMenuItem>Support</DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleOpenDrawer}>
+                            Setting
+                        </DropdownMenuItem>
+
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={() => setLogOutOpen(true)}>Logout</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
+                <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+                    {drawerOpen && drawerData && (
+                        <DrawerUpdate token_type={token_type} tokens={access_token} data={drawerData} onUpdateFinish={handleUpdateFinish} />
+                    )}
+                </Drawer>
             </header>
 
 

@@ -17,7 +17,6 @@ export default function BlogLayout({
 }) {
     return (
         <>
-
             <div className="container lg:px-10 px-6 md:px-8 sm:px-3 py-6 ">
                 <div className="flex md:flex-wrap justify-between">
                     <Breadcrumb className="hidden md:flex">

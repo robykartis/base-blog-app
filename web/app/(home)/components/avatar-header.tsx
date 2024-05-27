@@ -5,9 +5,11 @@ import { Button } from '@/components/ui/button'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/options'
 import Link from 'next/link'
+import { IMAGE_URL } from '@/lib/ApiURL'
 
 const AvatarHeader = async () => {
     const session: any | null = await getServerSession(authOptions);
+    const userData = session.user.data
     // console.log(session);
     const isLoggedIn = session !== null; // Define the isLoggedIn variable
     return (
@@ -21,19 +23,17 @@ const AvatarHeader = async () => {
                             className="overflow-hidden rounded-full"
                         >
                             <Avatar>
-                                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                                <AvatarFallback>{session.user.data.name}</AvatarFallback>
+                                <AvatarImage src={`${IMAGE_URL}${userData.profile_photo_thumbnail_url}${userData.profile_photo_thumbnail_path}`} alt={userData.name} />
+                                <AvatarFallback>{userData.name}</AvatarFallback>
                             </Avatar>
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>{session.user.data.name}</DropdownMenuLabel>
+                        <DropdownMenuLabel>{userData.name}</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <Link href="/dashboard">
                             <DropdownMenuItem>Dashboard</DropdownMenuItem>
                         </Link>
-
-
                     </DropdownMenuContent>
                 </DropdownMenu>
             ) : (

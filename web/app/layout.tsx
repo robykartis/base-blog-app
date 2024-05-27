@@ -22,7 +22,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <NextTopLoader
-          color="#2299DD"
+          color="#48586e"
           initialPosition={0.08}
           crawlSpeed={200}
           height={3}
@@ -30,7 +30,7 @@ export default function RootLayout({
           showSpinner={true}
           easing="ease"
           speed={400}
-          shadow="0 0 10px #2299DD,0 0 5px #2299DD"
+          shadow="0 0 10px #48586e,0 0 5px #48586e"
           template='<div class="bar" role="bar"><div class="peg"></div></div>'
           zIndex={1600}
           showAtBottom={false}

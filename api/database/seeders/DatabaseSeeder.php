@@ -23,7 +23,8 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@email.com',
             'username' => 'admin',
             'role' => 'admin',
-            'profile_photo_url' => 'assets/image/user/',
+            'profile_photo_path_url' => 'assets/image/user/',
+            'profile_photo_thumbnail_url' => 'assets/image/user/thumbnail/',
             'password' => Hash::make('123'),
         ]);
         $user2 = User::create([
@@ -31,7 +32,8 @@ class DatabaseSeeder extends Seeder
             'username' => 'user',
             'email' => 'user@email.com',
             'role' => 'user',
-            'profile_photo_url' => 'assets/image/user/',
+            'profile_photo_path_url' => 'assets/image/user/',
+            'profile_photo_thumbnail_url' => 'assets/image/user/thumbnail/',
             'password' => Hash::make('123'),
         ]);
 

@@ -7,7 +7,7 @@ const ButtonAuth = ({ label, loading }: { label: string, loading: boolean }) => 
     return (
         <Button className="w-full" disabled={loading}>
             {loading ? (
-                <span className="mr-2 h-4 w-4 animate-spin" />
+                <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
             ) : (
                 <span>{label}</span>
             )}

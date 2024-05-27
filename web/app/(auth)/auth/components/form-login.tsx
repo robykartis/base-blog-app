@@ -30,17 +30,18 @@ import { useRouter } from 'next/navigation'
 import { useFormStatus } from 'react-dom'
 import { signIn } from 'next-auth/react'
 import ButtonAuth from './button-auth'
+import Link from 'next/link'
 
 export default function FormLogin() {
 
-    const [isMutating, setIsMutating] = useState(false);
+    const [loading, setLoading] = useState<boolean>(false);
     const route = useRouter();
     const [errorsRes, setErrors] = useState<any>({});
     const { pending } = useFormStatus();
 
     const FormSchema = z.object({
         email: z.string().email().min(1, { message: "Email harus diisi" }),
-        password: z.string().min(6, { message: 'Password harus diisi minimal 6 karakter' }),
+        password: z.string().min(3, { message: 'Password harus diisi minimal 6 karakter' }),
     })
 
     const form = useForm<z.infer<typeof FormSchema>>({
@@ -52,7 +53,7 @@ export default function FormLogin() {
     });
 
     const handleSubmit = (formData: z.infer<typeof FormSchema>) => {
-        setIsMutating(true);
+        setLoading(true);
         axios
             .post(LOGIN_URL, formData, {
                 headers: {
@@ -61,8 +62,8 @@ export default function FormLogin() {
             })
             .then((res) => {
                 const response = res;
-                console.log(response);
-                setIsMutating(false);
+                // console.log(response);
+                setLoading(false);
                 if (response?.status == 200) {
                     signIn("credentials", {
                         email: formData.email,
@@ -70,7 +71,7 @@ export default function FormLogin() {
                         redirect: true,
                         callbackUrl: "/dashboard",
                     });
-                    console.log(response.data)
+                    // console.log(response.data)
                     localStorage.setItem("token", response.data.access_token)
                     localStorage.setItem("level", response.data.data.role)
 
@@ -90,10 +91,12 @@ export default function FormLogin() {
                 }
             })
             .catch((error: any) => {
-                setIsMutating(false);
-                if (error.response && error.response.data && error.response.data.errors) {
-                    setErrors(error.response.data.errors);
+                console.log(error.response);
+                setLoading(false);
+                if (error.response && error.response.data && error.response.data.message) {
+                    setErrors(error.response.data.message);
                     toast({
+                        variant: "destructive",
                         title: 'Error',
                         description: error.response?.data.message,
                         duration: 5000
@@ -110,15 +113,15 @@ export default function FormLogin() {
             <div className="grid gap-4">
                 <Card>
                     <CardHeader>
-                        <CardTitle>Register Account</CardTitle>
+                        <CardTitle className='text-2xl font-bold bg-gradient-to-r from-orange-700 via-blue-500 to-green-400 text-transparent bg-clip-text bg-300% animate-gradient'>Login Account</CardTitle>
                         <CardDescription>
-                            Register to your account to continue.
+                            Login to your account to continue.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-2">
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(handleSubmit)} >
-                                <div className="grid lg:grid-cols-2 md:grid-cols-1 gap-4">
+                                <div className="grid lg:grid-cols-1 md:grid-cols-1 gap-4">
                                     <div className="space-y-1">
                                         <FormField
                                             control={form.control}
@@ -135,6 +138,8 @@ export default function FormLogin() {
                                             )}
                                         />
                                     </div>
+                                </div>
+                                <div className="grid lg:grid-cols-1 md:grid-cols-1 gap-4">
                                     <div className="space-y-1">
                                         <FormField
                                             control={form.control}
@@ -153,8 +158,11 @@ export default function FormLogin() {
                                     </div>
                                 </div>
 
-                                <div className="py-4">
-                                    <ButtonAuth label="Login" loading={isMutating} />
+                                <div className="py-4 space-y-4">
+                                    <ButtonAuth label="Login" loading={loading} />
+                                    <Link href="/" >
+                                        <Button variant="outline" className='w-full mt-4'>Cancel</Button>
+                                    </Link>
                                 </div>
                             </form>
                         </Form>

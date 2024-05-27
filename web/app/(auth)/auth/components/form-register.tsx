@@ -29,10 +29,12 @@ import { REGISTER_URL } from '@/lib/ApiURL'
 import { useRouter } from 'next/navigation'
 import { useFormStatus } from 'react-dom'
 import { signIn } from 'next-auth/react'
+import ButtonAuth from './button-auth'
+import Link from 'next/link'
 
 export default function FormRegister() {
 
-    const [isMutating, setIsMutating] = useState(false);
+    const [loading, setLoading] = useState<boolean>(false);
     const route = useRouter();
     const [errorsRes, setErrors] = useState<any>({});
     const { pending } = useFormStatus();
@@ -60,7 +62,7 @@ export default function FormRegister() {
     });
 
     const handleSubmit = (formData: z.infer<typeof FormSchema>) => {
-        setIsMutating(true);
+        setLoading(true);
         axios
             .post(REGISTER_URL, formData, {
                 headers: {
@@ -70,7 +72,7 @@ export default function FormRegister() {
             .then((res) => {
                 const response = res;
                 console.log(response);
-                setIsMutating(false);
+                setLoading(false);
                 if (response?.status == 200) {
                     signIn("credentials", {
                         email: formData.email,
@@ -98,10 +100,12 @@ export default function FormRegister() {
                 }
             })
             .catch((error: any) => {
-                setIsMutating(false);
-                if (error.response && error.response.data && error.response.data.errors) {
-                    setErrors(error.response.data.errors);
+                console.log(error.response);
+                setLoading(false);
+                if (error.response && error.response.data && error.response.data.message) {
+                    setErrors(error.response.data.message);
                     toast({
+                        variant: "destructive",
                         title: 'Error',
                         description: error.response?.data.message,
                         duration: 5000
@@ -118,7 +122,7 @@ export default function FormRegister() {
             <div className="grid gap-4">
                 <Card>
                     <CardHeader>
-                        <CardTitle>Register Account</CardTitle>
+                        <CardTitle className='text-2xl font-bold bg-gradient-to-r from-orange-700 via-blue-500 to-green-400 text-transparent bg-clip-text bg-300% animate-gradient'>Register Account</CardTitle>
                         <CardDescription>
                             Register to your account to continue.
                         </CardDescription>
@@ -214,8 +218,11 @@ export default function FormRegister() {
                                         />
                                     </div>
                                 </div>
-                                <div className="py-4">
-                                    <Button type="submit" className='w-full'>Submit</Button>
+                                <div className="py-4 space-y-4">
+                                    <ButtonAuth label="Register" loading={loading} />
+                                    <Link href="/">
+                                        <Button variant="outline" className='w-full mt-4'>Cancel</Button>
+                                    </Link>
                                 </div>
                             </form>
                         </Form>

@@ -1,6 +1,4 @@
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { SheetTrigger, SheetContent, Sheet } from "@/components/ui/sheet"
 import { Metadata } from "next"
 
 export const metadata: Metadata = {

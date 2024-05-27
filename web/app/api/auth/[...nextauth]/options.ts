@@ -6,16 +6,21 @@ import CredentialsProvider from "next-auth/providers/credentials";
 
 export interface CustomSession {
   user?: CustomUser;
+  data?: string;
   roles?: string;
   level?: string;
   expires: ISODateString;
 }
 export interface CustomUser {
   id?: string | null;
-  nama?: string | null;
+  name?: string | null;
+  username?: string | null;
   email?: string | null;
-  level?: string | null;
+  role?: string | null;
+  profile_photo_path?: string | null;
+  profile_photo_url?: string | null;
   access_token?: string;
+  token_type?: string;
   data?: string | null;
   created_at?: string | null;
   updated_at?: string | null;

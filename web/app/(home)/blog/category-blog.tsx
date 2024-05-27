@@ -8,16 +8,8 @@ const CategoryBlog = () => {
     return (
         <>
             <section>
-                <aside className="bg-white rounded-lg shadow-md p-6 sticky top-20">
-                    <div className="mb-6">
-                        <h3 className="text-xl font-bold mb-4">Search</h3>
-                        <form className="flex">
-                            <Input className="flex-1 rounded-l-md" placeholder="Search..." type="text" />
-                            <Button className="rounded-r-md" type="submit">
-                                <SearchIcon className="h-5 w-5" />
-                            </Button>
-                        </form>
-                    </div>
+                <aside className="bg-muted rounded-lg  shadow-md p-6 sticky top-20">
+
                     <div className="mb-6">
                         <h3 className="text-xl font-bold mb-4">Categories</h3>
                         <ul className="space-y-2">

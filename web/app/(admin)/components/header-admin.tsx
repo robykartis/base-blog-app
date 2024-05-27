@@ -32,7 +32,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { ModeToggle } from "@/components/theme-toggle"
 
 import { useState } from "react"
-import { CustomSession } from "@/app/api/auth/[...nextauth]/options"
+import { CustomSession, CustomUser } from "@/app/api/auth/[...nextauth]/options"
 import { signOut, useSession } from "next-auth/react"
 import { LOGOUT_URL } from '@/lib/ApiURL'
 import axios from "@/lib/axios"
@@ -46,6 +46,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import { ReloadIcon } from "@radix-ui/react-icons"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 const HeaderAdmin = () => {
 
@@ -54,9 +55,10 @@ const HeaderAdmin = () => {
 
     const { data } = useSession();
     const userSession = data as CustomSession;
-    const dataSession = userSession?.user;
-    const tokens = dataSession?.access_token
-    // console.log(tokens);
+    // console.log(userSession);
+    const { access_token, token_type } = userSession?.user || {};
+    // console.log(access_token, token_type);
+    const userData: any = userSession?.user?.data || {};
 
     const logoutUser = async () => {
         setLoading(true);
@@ -66,7 +68,7 @@ const HeaderAdmin = () => {
                 {},
                 {
                     headers: {
-                        Authorization: `Bearer ${tokens}`,
+                        Authorization: `${token_type} ${access_token}`,
                     },
                 }
             );
@@ -176,17 +178,14 @@ const HeaderAdmin = () => {
                             size="icon"
                             className="overflow-hidden rounded-full"
                         >
-                            <Image
-                                src="/placeholder-user.jpg"
-                                width={36}
-                                height={36}
-                                alt="Avatar"
-                                className="overflow-hidden rounded-full"
-                            />
+                            <Avatar>
+                                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                                <AvatarFallback>{userData.name}</AvatarFallback>
+                            </Avatar>
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                        <DropdownMenuLabel>{userData.name}</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>Settings</DropdownMenuItem>
                         <DropdownMenuItem>Support</DropdownMenuItem>
@@ -196,15 +195,16 @@ const HeaderAdmin = () => {
                 </DropdownMenu>
             </header>
 
+
             <Dialog open={logoutOpen} onOpenChange={setLogOutOpen}>
-                <DialogContent>
+                <DialogContent className=" justify-items-center ">
                     <DialogHeader>
-                        <DialogTitle>Apa Anda Yakin ?</DialogTitle>
-                        <DialogDescription>
+                        <DialogTitle className="text-center">Apa Anda Yakin ?</DialogTitle>
+                        <DialogDescription className="text-center">
                             Tindakan ini akan mengakhiri sesi Anda dan Anda perlu masuk kembali untuk mengakses dasbor Anda.
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="flex justify-end space-x-4">
+                    <div className="flex  space-x-4">
                         {loading ? (
                             <Button variant="destructive" onClick={logoutUser}>
                                 Ya Logout!
@@ -221,6 +221,7 @@ const HeaderAdmin = () => {
                     </div>
                 </DialogContent>
             </Dialog>
+
         </>
     )
 }

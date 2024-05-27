@@ -56,7 +56,9 @@ const HeaderHomeComponent = () => {
                             </Link>
                         </nav>
                         <div className=" px-2 flex justify-center items-center gap-2">
-                            <Button variant="default" size="sm">Login</Button>
+                            <Link href="/auth">
+                                <Button variant="default" size="sm">Login</Button>
+                            </Link>
                             <ModeToggle />
                         </div>
 

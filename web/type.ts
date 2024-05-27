@@ -5,6 +5,16 @@ type AuthStateType = {
     password?: string;
     password_confirmation?: string;
   };
+
+  type AuthUserRegisterType = {
+    id?: number;
+    email?: string;
+    name?: string;
+    level?: string;
+    no_hp?: string;
+    jk?: string;
+    created_at?: string; 
+   }
 // User data
 type UserType = {
     id?: number;

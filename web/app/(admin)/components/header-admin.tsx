@@ -204,11 +204,11 @@ const HeaderAdmin = () => {
                         <DropdownMenuItem onClick={() => setLogOutOpen(true)}>Logout</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
-                <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+                <Dialog open={drawerOpen} onOpenChange={setDrawerOpen}>
                     {drawerOpen && drawerData && (
                         <DrawerUpdate token_type={token_type} tokens={access_token} data={drawerData} onUpdateFinish={handleUpdateFinish} />
                     )}
-                </Drawer>
+                </Dialog>
             </header>
 
 

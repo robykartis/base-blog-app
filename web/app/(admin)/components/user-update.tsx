@@ -11,6 +11,14 @@ import axios from "@/lib/axios"
 
 import { Button } from "@/components/ui/button"
 import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import {
     Drawer,
     DrawerClose,
     DrawerContent,
@@ -39,28 +47,15 @@ import { useEffect, useState } from "react";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { DETAIL_USER_URL, UPDATE_USER_URL } from "@/lib/ApiURL";
-import { getUserDetail } from "@/app/api/Admin/User";
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 
-interface FormData {
-    id: number;
-    id_user: number;
-    NamaUser: string;
-    level: string;
-    NoHp: string;
-    JK: string;
-    Email: string;
-    password?: string;
-    cPassword?: string;
-}
 function DrawerUpdate({ token_type, tokens, data, onUpdateFinish }: { token_type: any, tokens: any, data: any, onUpdateFinish: () => void }) {
-    console.log(token_type);
-    console.log(tokens);
-    console.log(data);
+    // console.log(token_type);
+    // console.log(tokens);
+    // console.log(data);
     const { pending } = useFormStatus();
-    const [errorsRes, setErrors] = useState<any>({});
     const router = useRouter();
-
     const [isLoading, setIsLoading] = useState(true);
     useEffect(() => {
         // Simulasikan pemuatan data
@@ -84,6 +79,7 @@ function DrawerUpdate({ token_type, tokens, data, onUpdateFinish }: { token_type
         id: z.string(),
         name: z.string().min(1, { message: "Nama harus diisi" }),
         email: z.string().min(1, { message: 'Email harus diisi' }).email('dengan email valid'),
+        username: z.string().min(1, { message: "Username harus diisi" }),
         profile_photo_path: z
             .any()
             .refine((files) => {
@@ -92,7 +88,7 @@ function DrawerUpdate({ token_type, tokens, data, onUpdateFinish }: { token_type
             .refine(
                 (files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
                 "Only .jpg, .jpeg, .png and .webp formats are supported."
-            ),
+            ).optional(),
         old_password: z.string().optional(),
         password: z.string().optional(),
         c_password: z.string().optional()
@@ -118,6 +114,7 @@ function DrawerUpdate({ token_type, tokens, data, onUpdateFinish }: { token_type
             c_password: '',
             name: data.name,
             email: data.email,
+            username: data.username,
             profile_photo_path: null,
         },
     });
@@ -125,11 +122,11 @@ function DrawerUpdate({ token_type, tokens, data, onUpdateFinish }: { token_type
     const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (formData: any) => {
 
         try {
-            const { password, cPassword, ...submissionData } = formData;
-            if (!password && !cPassword) {
+            const { password, c_password, ...submissionData } = formData;
+            if (!password && !c_password) {
                 delete submissionData.password;
             } else {
-                if (password.length < 6 || password !== cPassword) {
+                if (password.length < 6 || password !== c_password) {
                     throw new Error('Password dan konfirmasi password tidak sama atau kurang dari 6 karakter');
                 }
                 submissionData.password = password;
@@ -144,6 +141,7 @@ function DrawerUpdate({ token_type, tokens, data, onUpdateFinish }: { token_type
                     },
                 }
             );
+            console.log(response);
             router.refresh();
             toast({
                 title: 'Success',
@@ -153,10 +151,20 @@ function DrawerUpdate({ token_type, tokens, data, onUpdateFinish }: { token_type
             onUpdateFinish();
         } catch (error: any) {
             if (error.response && error.response.data && error.response.data.errors) {
-                setErrors(error.response.data.errors);
+                const errorMessage = [];
+                if (error.response.data.message.email) {
+                    errorMessage.push(error.response.data.message.email[0]);
+                }
+                if (error.response.data.message.username) {
+                    errorMessage.push(error.response.data.message.username[0]);
+                }
+                if (errorMessage.length === 0) {
+                    errorMessage.push('Unknown error');
+                }
                 toast({
+                    variant: "destructive",
                     title: 'Error',
-                    description: error.response?.data.message,
+                    description: errorMessage.join(',  '),
                     duration: 5000
                 });
             } else {
@@ -167,16 +175,92 @@ function DrawerUpdate({ token_type, tokens, data, onUpdateFinish }: { token_type
 
 
     return (
-        <DrawerContent>
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
-                    <div className="mx-auto w-full max-w-full p-6">
-                        <DrawerHeader className="justify-items-center">
-                            <DrawerTitle>Update User</DrawerTitle>
-                            <DrawerDescription>Update informasi user</DrawerDescription>
-                        </DrawerHeader>
-                        <div className="grid items-start gap-4">
-                            <div className="grid grid-cols-3 gap-4">
+        <DialogContent className="sm:max-w-[425px] lg:max-w-[950px] sm:rounded-md">
+            <ScrollArea className="h-[500px]">
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
+                        <div className="mx-auto w-full max-w-full p-6">
+                            <DrawerHeader className="justify-items-center ">
+                                <DrawerTitle>Update User</DrawerTitle>
+                                <DrawerDescription>Update informasi user</DrawerDescription>
+                            </DrawerHeader>
+                            <div className="grid items-start gap-4">
+                                <div className="grid lg:grid-cols-1 md:grid-cols-1 gap-4">
+                                    <div className="space-y-2">
+                                        {isLoading ? (
+                                            <Skeleton className="h-8 rounded-md mt-8" />
+                                        ) : (
+                                            <>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="name"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Nama User</FormLabel>
+                                                            <Input
+                                                                id="name"
+                                                                placeholder="Name User"
+                                                                {...field}
+                                                            />
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </>
+                                        )}
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        {isLoading ? (
+                                            <Skeleton className="h-8 rounded-md mt-8" />
+                                        ) : (
+                                            <>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="email"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Email</FormLabel>
+                                                            <Input
+                                                                id="email"
+                                                                placeholder="Email User"
+                                                                {...field}
+                                                            />
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </>
+                                        )}
+
+                                    </div>
+                                    <div className="space-y-2">
+                                        {isLoading ? (
+                                            <Skeleton className="h-8 rounded-md mt-8" />
+                                        ) : (
+                                            <>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="username"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Username</FormLabel>
+                                                            <Input
+                                                                id="usernama"
+                                                                placeholder="Username"
+                                                                {...field}
+                                                            />
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </>
+                                        )}
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="grid lg:grid-cols-1 md:grid-cols-1">
                                 <div className="space-y-2">
                                     {isLoading ? (
                                         <Skeleton className="h-8 rounded-md mt-8" />
@@ -184,13 +268,13 @@ function DrawerUpdate({ token_type, tokens, data, onUpdateFinish }: { token_type
                                         <>
                                             <FormField
                                                 control={form.control}
-                                                name="name"
+                                                name="password"
                                                 render={({ field }) => (
                                                     <FormItem>
-                                                        <FormLabel>Nama User</FormLabel>
+                                                        <FormLabel>Old Password</FormLabel>
                                                         <Input
-                                                            id="name"
-                                                            placeholder="Name User"
+                                                            type="password"
+                                                            placeholder="Masukkan Password"
                                                             {...field}
                                                         />
                                                         <FormMessage />
@@ -199,8 +283,8 @@ function DrawerUpdate({ token_type, tokens, data, onUpdateFinish }: { token_type
                                             />
                                         </>
                                     )}
-                                </div>
 
+                                </div>
                                 <div className="space-y-2">
                                     {isLoading ? (
                                         <Skeleton className="h-8 rounded-md mt-8" />
@@ -208,13 +292,37 @@ function DrawerUpdate({ token_type, tokens, data, onUpdateFinish }: { token_type
                                         <>
                                             <FormField
                                                 control={form.control}
-                                                name="email"
+                                                name="password"
                                                 render={({ field }) => (
                                                     <FormItem>
-                                                        <FormLabel>Email</FormLabel>
+                                                        <FormLabel>New Password</FormLabel>
                                                         <Input
-                                                            id="email"
-                                                            placeholder="Email User"
+                                                            type="password"
+                                                            placeholder="Masukkan Password"
+                                                            {...field}
+                                                        />
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </>
+                                    )}
+
+                                </div>
+                                <div className="space-y-2">
+                                    {isLoading ? (
+                                        <Skeleton className="h-8 rounded-md mt-8" />
+                                    ) : (
+                                        <>
+                                            <FormField
+                                                control={form.control}
+                                                name="c_password"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Confirm New Password</FormLabel>
+                                                        <Input
+                                                            type="password"
+                                                            placeholder="Masukkan Password"
                                                             {...field}
                                                         />
                                                         <FormMessage />
@@ -226,85 +334,36 @@ function DrawerUpdate({ token_type, tokens, data, onUpdateFinish }: { token_type
 
                                 </div>
                             </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
+
+                            <DrawerFooter>
                                 {isLoading ? (
                                     <Skeleton className="h-8 rounded-md mt-8" />
                                 ) : (
                                     <>
-                                        <FormField
-                                            control={form.control}
-                                            name="password"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Password</FormLabel>
-                                                    <Input
-                                                        type="password"
-                                                        placeholder="Masukkan Password"
-                                                        {...field}
-                                                    />
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
+                                        {pending ? (
+                                            <Button disabled >
+                                                <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                                                Process...
+                                            </Button>
+                                        ) : (
+                                            <Button type="submit" disabled={pending}>
+                                                Update
+                                            </Button>
+                                        )}
+                                        <DrawerClose asChild>
+                                            <Button variant="outline">Cancel</Button>
+                                        </DrawerClose>
                                     </>
                                 )}
 
-                            </div>
-                            <div className="space-y-2">
-                                {isLoading ? (
-                                    <Skeleton className="h-8 rounded-md mt-8" />
-                                ) : (
-                                    <>
-                                        <FormField
-                                            control={form.control}
-                                            name="c_password"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Confirm Password</FormLabel>
-                                                    <Input
-                                                        type="password"
-                                                        placeholder="Masukkan Password"
-                                                        {...field}
-                                                    />
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </>
-                                )}
 
-                            </div>
+                            </DrawerFooter>
                         </div>
+                    </form>
 
-                        <DrawerFooter>
-                            {isLoading ? (
-                                <Skeleton className="h-8 rounded-md mt-8" />
-                            ) : (
-                                <>
-                                    {pending ? (
-                                        <Button disabled >
-                                            <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-                                            Process...
-                                        </Button>
-                                    ) : (
-                                        <Button disabled={pending}>
-                                            Update
-                                        </Button>
-                                    )}
-                                    <DrawerClose asChild>
-                                        <Button variant="outline">Cancel</Button>
-                                    </DrawerClose>
-                                </>
-                            )}
-
-
-                        </DrawerFooter>
-                    </div>
-                </form>
-            </Form>
-        </DrawerContent >
+                </Form>
+            </ScrollArea>
+        </DialogContent >
     )
 }
 

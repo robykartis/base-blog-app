@@ -9,9 +9,14 @@ import { IMAGE_URL } from '@/lib/ApiURL'
 
 const AvatarHeader = async () => {
     const session: any | null = await getServerSession(authOptions);
-    const userData = session.user.data
+    let isLoggedIn = false;
+    let userData = null;
+
+    if (session) {
+        isLoggedIn = true;
+        userData = session.user.data;
+    }
     // console.log(session);
-    const isLoggedIn = session !== null; // Define the isLoggedIn variable
     return (
         <>
             {isLoggedIn ? (

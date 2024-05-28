@@ -21,8 +21,8 @@ const HeaderHomeComponent = () => {
                             <MenuHome />
                         </nav>
                         <div className=" px-2 flex justify-center items-center gap-2">
-                            <AvatarHeader />
                             <ModeToggle />
+                            <AvatarHeader />
                         </div>
 
                         <Sheet>

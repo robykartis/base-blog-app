@@ -103,11 +103,20 @@ export default function FormRegister() {
                 console.log(error.response);
                 setLoading(false);
                 if (error.response && error.response.data && error.response.data.message) {
-                    setErrors(error.response.data.message);
+                    const errorMessage = [];
+                    if (error.response.data.message.email) {
+                        errorMessage.push(error.response.data.message.email[0]);
+                    }
+                    if (error.response.data.message.username) {
+                        errorMessage.push(error.response.data.message.username[0]);
+                    }
+                    if (errorMessage.length === 0) {
+                        errorMessage.push('Unknown error');
+                    }
                     toast({
                         variant: "destructive",
                         title: 'Error',
-                        description: error.response?.data.message,
+                        description: errorMessage.join(',  '),
                         duration: 5000
                     });
                 } else {

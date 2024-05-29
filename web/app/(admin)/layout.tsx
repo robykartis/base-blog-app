@@ -5,6 +5,7 @@ import NextAuthSessionProvider from "@/providers/SessionProvider"
 import { getServerSession } from "next-auth"
 import { authOptions } from "../api/auth/[...nextauth]/options"
 import { redirect } from "next/navigation"
+import { SWRProvider } from "@/lib/swr-provider"
 
 export default async function DashboardLayout({
     children, // will be a page or nested layout
@@ -19,16 +20,18 @@ export default async function DashboardLayout({
     return (
         <>
             <NextAuthSessionProvider>
-                <div className="flex min-h-screen w-full flex-col bg-muted/40">
-                    <SidebarAdmin />
-                    <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
-                        <HeaderAdmin />
-                        <main>
-                            {children}
-                        </main>
+                <SWRProvider>
+                    <div className="flex min-h-screen w-full flex-col bg-muted/40">
+                        <SidebarAdmin />
+                        <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
+                            <HeaderAdmin />
+                            <main>
+                                {children}
+                            </main>
 
+                        </div>
                     </div>
-                </div>
+                </SWRProvider>
             </NextAuthSessionProvider>
         </>
     )

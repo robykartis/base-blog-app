@@ -1,21 +1,38 @@
+'use client'
 import React from 'react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/app/api/auth/[...nextauth]/options'
 import Link from 'next/link'
-import { IMAGE_URL } from '@/lib/ApiURL'
+import { DETAIL_USER_URL, IMAGE_URL } from '@/lib/ApiURL'
+import { ReloadIcon } from '@radix-ui/react-icons'
+import useSWR from 'swr';
+import axios from '@/lib/axios'
 
-const AvatarHeader = async () => {
-    const session: any | null = await getServerSession(authOptions);
-    let isLoggedIn = false;
-    let userData = null;
+const AvatarHeader = ({ data_token, isLoggedIn }: any) => {
+    async function fetcher(url: string) {
 
-    if (session) {
-        isLoggedIn = true;
-        userData = session.user.data;
+        const response = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${data_token}`,
+            },
+        });
+        // console.log(response);
+        return response.data;
     }
+
+    const { data, mutate, error } = useSWR(`${DETAIL_USER_URL}${isLoggedIn}`, fetcher, {
+        // refreshInterval: 1000
+    });
+
+    // console.log(data);
+
+    if (error) return <div> <Link href="/auth">
+        <Button variant="default" size="sm">Login</Button>
+    </Link></div>;
+    if (!data) return <div><ReloadIcon className="mr-2 h-4 w-4 animate-spin" /></div>;
+
+    const userData = data.data
     // console.log(session);
     return (
         <>

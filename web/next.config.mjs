@@ -15,8 +15,10 @@ const nextConfig = {
         hostname: "vercel.com",
       },
       {
-        protocol: "https",
-        hostname: "projectdua.fsetiawan.my.id",
+        protocol: "http",
+        hostname: "localhost",
+        port: "8000",
+        pathname: "/**",
       },
     ],
   },

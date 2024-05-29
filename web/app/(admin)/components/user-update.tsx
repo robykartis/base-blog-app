@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input"
 import { useRouter } from "next/navigation"
 import * as z from 'zod';
 import { useForm } from "react-hook-form"
-import useSWRMutation from 'swr/mutation'
+// import useSWRMutation from 'swr/mutation'
 
 import axios from "@/lib/axios"
 
@@ -46,133 +46,124 @@ import { toast } from "@/components/ui/use-toast";
 import { useEffect, useState } from "react";
 
 import { Skeleton } from "@/components/ui/skeleton";
-import { DETAIL_USER_URL, UPDATE_USER_URL } from "@/lib/ApiURL";
+import { IMAGE_URL, UPDATE_USER_URL } from "@/lib/ApiURL";
 import { ScrollArea } from "@/components/ui/scroll-area"
-
+import Image from "next/image";
 
 function DrawerUpdate({ token_type, tokens, data, onUpdateFinish }: { token_type: any, tokens: any, data: any, onUpdateFinish: () => void }) {
-    // console.log(token_type);
-    // console.log(tokens);
-    // console.log(data);
-    const { pending } = useFormStatus();
+
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(true);
+    const [errorsRes, setErrors] = useState<any>({});
+    const [pending, setPending] = useState<boolean>(false);
+    const [preview, setPreview] = useState<string | null>(null);
+
     useEffect(() => {
-        // Simulasikan pemuatan data
         const timer = setTimeout(() => {
             setIsLoading(false);
-        }, 2000); // Ubah durasi sesuai kebutuhan
+        }, 2000);
 
         return () => clearTimeout(timer);
     }, []);
 
-
-    // const ACCEPTED_IMAGE_MIME_TYPES = [
-    //     "image/jpeg",
-    //     "image/jpg",
-    //     "image/png",
-    //     "image/webp",
-    // ];
-    const MAX_FILE_SIZE = 1024 * 1024 * 5;
-    const ACCEPTED_IMAGE_TYPES = ["jpeg", "jpg", "png", "webp"];
     const FormSchema = z.object({
-        id: z.string(),
+        id: z.string().uuid(),
         name: z.string().min(1, { message: "Nama harus diisi" }),
         email: z.string().min(1, { message: 'Email harus diisi' }).email('dengan email valid'),
         username: z.string().min(1, { message: "Username harus diisi" }),
-        profile_photo_path: z
-            .any()
-            .refine((files) => {
-                return files?.[0]?.size <= MAX_FILE_SIZE;
-            }, `Max image size is 5MB.`)
-            .refine(
-                (files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
-                "Only .jpg, .jpeg, .png and .webp formats are supported."
-            ).optional(),
-        old_password: z.string().optional(),
-        password: z.string().optional(),
-        c_password: z.string().optional()
+        profile_photo_path: z.custom((value) => {
+            if (!value) return true; // Jika tidak ada file yang diunggah, dianggap valid
+            if (!(value instanceof File)) return false; // Jika tidak sesuai tipe File, dianggap tidak valid
+            const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+            const maxSize = 2 * 1024 * 1024; // 2MB
+
+            return validTypes.includes(value.type) && value.size <= maxSize;
+        }, {
+            message: 'Profile photo must be a file of type: jpg, jpeg, png and less than 2MB',
+        }).optional(),
+        old_password: z.optional(z.string()),
+        new_password: z.optional(z.string()),
+        new_c_password: z.optional(z.string()),
     }).refine((data) => {
-        if (data.password && data.password !== data.c_password) {
-            throw new Error('Password dan konfirmasi password tidak sama');
-        }
-        if ((data.password && !data.c_password) || (!data.password && data.c_password)) {
-            throw new Error('Password dan konfirmasi password harus diisi');
+        // Jika password diisi, konfirmasi password harus sama
+        if (data.new_password && data.new_password !== data.new_c_password) {
+            return false;
         }
         return true;
     }, {
         message: 'Password dan konfirmasi password tidak sama',
-        path: ['c_password'],
+        path: ['new_c_password'],
+    }).refine((data) => {
+        // Jika salah satu diisi, keduanya harus diisi
+        if ((data.new_password && !data.new_c_password) || (!data.new_password && data.new_c_password)) {
+            return false;
+        }
+        return true;
+    }, {
+        message: 'Password dan konfirmasi password harus diisi keduanya',
+        path: ['new_c_password'],
     });
 
-    const form = useForm<z.infer<typeof FormSchema>>({
+
+    const form = useForm({
         resolver: zodResolver(FormSchema),
         defaultValues: {
             id: data.id,
             old_password: '',
-            password: '',
-            c_password: '',
+            new_password: '',
+            new_c_password: '',
             name: data.name,
             email: data.email,
             username: data.username,
             profile_photo_path: null,
         },
     });
-
-    const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (formData: any) => {
-
-        try {
-            const { password, c_password, ...submissionData } = formData;
-            if (!password && !c_password) {
-                delete submissionData.password;
-            } else {
-                if (password.length < 6 || password !== c_password) {
-                    throw new Error('Password dan konfirmasi password tidak sama atau kurang dari 6 karakter');
-                }
-                submissionData.password = password;
-            }
-
-            const response = await axios.post(
-                UPDATE_USER_URL,
-                submissionData,
-                {
-                    headers: {
-                        Authorization: `${token_type}${tokens}`,
-                    },
-                }
-            );
-            console.log(response);
-            router.refresh();
-            toast({
-                title: 'Success',
-                description: response?.data.message,
-                duration: 2000
-            });
-            onUpdateFinish();
-        } catch (error: any) {
-            if (error.response && error.response.data && error.response.data.errors) {
-                const errorMessage = [];
-                if (error.response.data.message.email) {
-                    errorMessage.push(error.response.data.message.email[0]);
-                }
-                if (error.response.data.message.username) {
-                    errorMessage.push(error.response.data.message.username[0]);
-                }
-                if (errorMessage.length === 0) {
-                    errorMessage.push('Unknown error');
-                }
+    const onSubmit = (formData: z.infer<typeof FormSchema>) => {
+        setPending(true);
+        const url = `${UPDATE_USER_URL}/${data.id}`;
+        axios
+            .post(url, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    Accept: "application/json",
+                    Authorization: `Bearer ${tokens}`,
+                },
+            })
+            .then((res) => {
+                const response = res;
                 toast({
-                    variant: "destructive",
-                    title: 'Error',
-                    description: errorMessage.join(',  '),
-                    duration: 5000
+                    title: 'Success',
+                    description: response?.data.message,
+                    duration: 2000
                 });
-            } else {
-                console.error("Gagal menyimpan data. Terjadi kesalahan pada server.");
-            }
+                router.refresh();
+                setPending(false);
+
+                onUpdateFinish();
+            })
+            .catch((error: any) => {
+                console.log(error.response);
+                setPending(false);
+                if (error.response && error.response.data && error.response.data.message) {
+                    setErrors(error.response.data.message);
+                    toast({
+                        variant: "destructive",
+                        title: 'Error',
+                        description: error.response?.data.message,
+                        duration: 5000
+                    });
+                } else {
+                    console.error("Gagal menyimpan data. Terjadi kesalahan pada server." + error);
+                }
+            });
+    };
+    const handleFileChange = (e: any) => {
+        const file = e.target.files[0];
+        if (file) {
+            setPreview(URL.createObjectURL(file));
+            form.setValue('profile_photo_path', file);
         }
     };
-
 
     return (
         <DialogContent className="sm:max-w-[425px] lg:max-w-[950px] sm:rounded-md">
@@ -261,6 +252,7 @@ function DrawerUpdate({ token_type, tokens, data, onUpdateFinish }: { token_type
                                 </div>
                             </div>
                             <div className="grid lg:grid-cols-1 md:grid-cols-1">
+
                                 <div className="space-y-2">
                                     {isLoading ? (
                                         <Skeleton className="h-8 rounded-md mt-8" />
@@ -268,13 +260,13 @@ function DrawerUpdate({ token_type, tokens, data, onUpdateFinish }: { token_type
                                         <>
                                             <FormField
                                                 control={form.control}
-                                                name="password"
+                                                name="old_password"
                                                 render={({ field }) => (
                                                     <FormItem>
                                                         <FormLabel>Old Password</FormLabel>
                                                         <Input
                                                             type="password"
-                                                            placeholder="Masukkan Password"
+                                                            placeholder="Masukan Password Lama"
                                                             {...field}
                                                         />
                                                         <FormMessage />
@@ -292,13 +284,13 @@ function DrawerUpdate({ token_type, tokens, data, onUpdateFinish }: { token_type
                                         <>
                                             <FormField
                                                 control={form.control}
-                                                name="password"
+                                                name="new_password"
                                                 render={({ field }) => (
                                                     <FormItem>
                                                         <FormLabel>New Password</FormLabel>
                                                         <Input
                                                             type="password"
-                                                            placeholder="Masukkan Password"
+                                                            placeholder="Masukan Password Baru"
                                                             {...field}
                                                         />
                                                         <FormMessage />
@@ -316,18 +308,79 @@ function DrawerUpdate({ token_type, tokens, data, onUpdateFinish }: { token_type
                                         <>
                                             <FormField
                                                 control={form.control}
-                                                name="c_password"
+                                                name="new_c_password"
                                                 render={({ field }) => (
                                                     <FormItem>
                                                         <FormLabel>Confirm New Password</FormLabel>
                                                         <Input
                                                             type="password"
-                                                            placeholder="Masukkan Password"
+                                                            placeholder="Masukan Kembali Password"
                                                             {...field}
                                                         />
                                                         <FormMessage />
                                                     </FormItem>
                                                 )}
+                                            />
+                                        </>
+                                    )}
+
+                                </div>
+                            </div>
+                            <div className="grid lg:grid-cols-3 md:grid-cols-1">
+                                <div className="space-y-2">
+                                    {isLoading ? (
+                                        <Skeleton className="h-8 rounded-md mt-8" />
+                                    ) : (
+                                        <>
+                                            <FormField
+                                                control={form.control}
+                                                name="profile_photo_path"
+                                                render={({ field: { value, onChange, ...fieldProps } }) => (
+                                                    <FormItem onChange={handleFileChange}>
+                                                        <FormLabel>Profile Photo</FormLabel>
+                                                        <Input
+                                                            {...fieldProps}
+                                                            placeholder="Profile Photo"
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={(event) =>
+                                                                onChange(event.target.files && event.target.files[0])
+                                                            }
+                                                        />
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                        </>
+                                    )}
+                                </div>
+
+                                <div className="space-y-2">
+                                    {isLoading ? (
+                                        <Skeleton className="h-8 rounded-md mt-8" />
+                                    ) : (
+                                        preview && (
+                                            <Image
+                                                src={preview}
+                                                className="rounded-md py-4 px-4"
+                                                alt="Profile Preview"
+                                                quality={100}
+                                                height={200}
+                                                width={200}
+                                            />
+                                        )
+                                    )}
+                                </div>
+                                <div className="space-y-2">
+                                    {isLoading ? (
+                                        <Skeleton className="h-8 rounded-md mt-8" />
+                                    ) : (
+                                        <>
+                                            <Image
+                                                src={`${IMAGE_URL}${data.profile_photo_path_url}${data.profile_photo_path}`} alt={data.name}
+                                                height={200}
+                                                width={200}
                                             />
                                         </>
                                     )}

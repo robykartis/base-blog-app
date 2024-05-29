@@ -71,6 +71,7 @@ export default function FormLogin() {
                         redirect: true,
                         callbackUrl: "/dashboard",
                     });
+                    setLoading(false);
                     // console.log(response.data)
                     localStorage.setItem("token", response.data.access_token)
                     localStorage.setItem("level", response.data.data.role)

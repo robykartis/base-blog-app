@@ -17,15 +17,12 @@ type AuthStateType = {
    }
 // User data
 type UserType = {
-    id?: number;
-    id_user?: number;
+    id?: string;
+    username?: string;
     name: string;
     email: string;
-    no_hp: string;
-    level: string;
-    jk: string;
     passwor?: string;
-    cPassword?: string;
+    c_password?: string;
 };
 // Pohon data
 type PohonType = {

@@ -7,8 +7,13 @@ import { ModeToggle } from '@/components/theme-toggle'
 import AvatarHeader from './avatar-header'
 import { MenuHome } from './menu-header'
 import { MenuIcon } from 'lucide-react'
+import { getToken } from '@/app/api/Admin/User'
 
-const HeaderHomeComponent = () => {
+const HeaderHomeComponent = async () => {
+    const Token = await getToken();
+    const data_token = Token?.user?.access_token
+    const data_id = Token?.user?.data?.id
+    console.log(data_id);
     return (
         <>
             <header className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-4 px-6 md:px-8 lg:px-10 sticky top-0 z-10  border-b border-foreground/10 transition-colors hover:text-foreground/80">
@@ -22,7 +27,7 @@ const HeaderHomeComponent = () => {
                         </nav>
                         <div className=" px-2 flex justify-center items-center gap-2">
                             <ModeToggle />
-                            <AvatarHeader />
+                            <AvatarHeader data_token={data_token} isLoggedIn={data_id} />
                         </div>
 
                         <Sheet>

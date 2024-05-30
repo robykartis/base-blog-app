@@ -21,7 +21,6 @@ import AvatarHeader from "./avatar-header"
 
 const HeaderAdmin = () => {
 
-    // console.log(drawerData);
     const { data } = useSession();
     const userSession = data as CustomSession;
     // console.log(userSession);

@@ -4,10 +4,11 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/options'
 
 export async function getToken() {
     const session: any | null = await getServerSession(authOptions);
+    console.log(session)
     const tokens = session
     return tokens
 }
-// console.log(getToken())
+console.log(getToken())
 interface DataProps {
     id_user?: any,
     type_token?: string

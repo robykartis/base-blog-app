@@ -11,29 +11,36 @@ import axios from '@/lib/axios'
 
 const AvatarHeader = ({ data_token, isLoggedIn }: any) => {
     async function fetcher(url: string) {
-
         const response = await axios.get(url, {
             headers: {
                 Authorization: `Bearer ${data_token}`,
             },
         });
-        // console.log(response);
         return response.data;
     }
 
     const { data, mutate, error } = useSWR(`${DETAIL_USER_URL}${isLoggedIn}`, fetcher, {
-        // refreshInterval: 1000
+        revalidateIfStale: false,
+        revalidateOnFocus: false,
+        revalidateOnReconnect: true
     });
 
-    // console.log(data);
+    if (error) return (
+        <div>
+            <Link href="/auth">
+                <Button variant="default" size="sm">Login</Button>
+            </Link>
+        </div>
+    );
 
-    if (error) return <div> <Link href="/auth">
-        <Button variant="default" size="sm">Login</Button>
-    </Link></div>;
-    if (!data) return <div><ReloadIcon className="mr-2 h-4 w-4 animate-spin" /></div>;
+    if (!data) return (
+        <div>
+            <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+        </div>
+    );
 
-    const userData = data.data
-    // console.log(session);
+    const userData = data.data;
+
     return (
         <>
             {isLoggedIn ? (
@@ -63,8 +70,6 @@ const AvatarHeader = ({ data_token, isLoggedIn }: any) => {
                     <Button variant="default" size="sm">Login</Button>
                 </Link>
             )}
-
-
         </>
     )
 }

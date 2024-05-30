@@ -1,3 +1,4 @@
+import Image from "next/image"
 import Link from "next/link"
 
 export default function BlogDetailPage({ params }: { params: any }) {
@@ -7,7 +8,7 @@ export default function BlogDetailPage({ params }: { params: any }) {
                 <div className="grid grid-cols-1  gap-8">
                     <article className="prose prose-gray max-w-full dark:prose-invert">
                         <div className="space-y-4">
-                            <img
+                            <Image
                                 alt="Blog post image"
                                 className="rounded-lg object-cover w-full"
                                 height="400"
@@ -25,32 +26,26 @@ export default function BlogDetailPage({ params }: { params: any }) {
                                 <p className="text-gray-500 dark:text-gray-400">Posted on August 24, 2023</p>
                             </div>
                             <p>
-                                Once upon a time, in a far-off land, there was a very lazy king who spent all day lounging on his
-                                throne. One day, his advisors came to him with a problem: the kingdom was running out of money.
+                                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Excepturi eos eius odio molestiae numquam, eaque quia veniam rem! Velit perferendis, ad, aspernatur ratione, repellat culpa nesciunt obcaecati placeat ullam possimus reprehenderit quam nemo eum voluptas nam blanditiis? Vel quis explicabo reprehenderit nobis ipsum quae temporibus, eaque, doloremque possimus architecto asperiores!
                             </p>
                             <p>
-                                Jokester began sneaking into the castle in the middle of the night and leaving jokes all over the
-                                place: under the king's pillow, in his soup, even in the royal toilet. The king was furious, but he
-                                couldn't seem to stop Jokester.
+                                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Excepturi eos eius odio molestiae numquam, eaque quia veniam rem! Velit perferendis, ad, aspernatur ratione, repellat culpa nesciunt obcaecati placeat ullam possimus reprehenderit quam nemo eum voluptas nam blanditiis? Vel quis explicabo reprehenderit nobis ipsum quae temporibus, eaque, doloremque possimus architecto asperiores!
                             </p>
                             <p>
-                                And then, one day, the people of the kingdom discovered that the jokes left by Jokester were so funny
-                                that they couldn't help but laugh. And once they started laughing, they couldn't stop.
+                                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Excepturi eos eius odio molestiae numquam, eaque quia veniam rem! Velit perferendis, ad, aspernatur ratione, repellat culpa nesciunt obcaecati placeat ullam possimus reprehenderit quam nemo eum voluptas nam blanditiis? Vel quis explicabo reprehenderit nobis ipsum quae temporibus, eaque, doloremque possimus architecto asperiores!
                             </p>
                             <blockquote>
-                                “After all,” he said, “everyone enjoys a good joke, so it's only fair that they should pay for the
-                                privilege.”
+                                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Excepturi eos eius odio molestiae numquam, eaque quia veniam rem! Velit perferendis, ad, aspernatur ratione, repellat culpa nesciunt obcaecati placeat ullam possimus reprehenderit quam nemo eum voluptas nam blanditiis? Vel quis explicabo reprehenderit nobis ipsum quae temporibus, eaque, doloremque possimus architecto asperiores!
                             </blockquote>
                             <h2>The Joke Tax</h2>
-                            <p>The king's subjects were not amused. They grumbled and complained, but the king was firm:</p>
+                            <p>The kings subjects were not amused. They grumbled and complained, but the king was firm:</p>
                             <ul>
                                 <li>1st level of puns: 5 gold coins</li>
                                 <li>2nd level of jokes: 10 gold coins</li>
                                 <li>3rd level of one-liners : 20 gold coins</li>
                             </ul>
                             <p>
-                                As a result, people stopped telling jokes, and the kingdom fell into a gloom. But there was one person
-                                who refused to let the king's foolishness get him down: a court jester named Jokester.
+                                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Excepturi eos eius odio molestiae numquam, eaque quia veniam rem! Velit perferendis, ad, aspernatur ratione, repellat culpa nesciunt obcaecati placeat ullam possimus reprehenderit quam nemo eum voluptas nam blanditiis? Vel quis explicabo reprehenderit nobis ipsum quae temporibus, eaque, doloremque possimus architecto asperiores!
                             </p>
                         </div>
                     </article>

@@ -14,27 +14,16 @@ export default function AboutPage() {
                     <div className="space-y-4">
                         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">About Our Blog</h1>
                         <p>
-                            Welcome to our blog, where we share our passion for all things web development, design, and
-                            technology. Our mission is to provide our readers with informative, engaging, and easy-to-understand
-                            content that helps them stay up-to-date with the latest trends and best practices in the industry.
+                            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Excepturi eos eius odio molestiae numquam, eaque quia veniam rem! Velit perferendis, ad, aspernatur ratione, repellat culpa nesciunt obcaecati placeat ullam possimus reprehenderit quam nemo eum voluptas nam blanditiis? Vel quis explicabo reprehenderit nobis ipsum quae temporibus, eaque, doloremque possimus architecto asperiores!
                         </p>
                         <p>
-                            Our team of experienced writers and subject matter experts curate a wide range of topics, from
-                            responsive web design and CSS frameworks to JavaScript libraries and performance optimization.
-                            Whether you're a seasoned developer or just starting out, you'll find something valuable on our
-                            blog.
+                            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Excepturi eos eius odio molestiae numquam, eaque quia veniam rem! Velit perferendis, ad, aspernatur ratione, repellat culpa nesciunt obcaecati placeat ullam possimus reprehenderit quam nemo eum voluptas nam blanditiis? Vel quis explicabo reprehenderit nobis ipsum quae temporibus, eaque, doloremque possimus architecto asperiores!
                         </p>
                         <p>
-                            We believe that learning should be a continuous process, and we're committed to providing our
-                            readers with the tools and resources they need to grow and improve their skills. From in-depth
-                            tutorials to thought-provoking articles, our content is designed to inspire, educate, and empower
-                            our readers.
+                            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Excepturi eos eius odio molestiae numquam, eaque quia veniam rem! Velit perferendis, ad, aspernatur ratione, repellat culpa nesciunt obcaecati placeat ullam possimus reprehenderit quam nemo eum voluptas nam blanditiis? Vel quis explicabo reprehenderit nobis ipsum quae temporibus, eaque, doloremque possimus architecto asperiores!
                         </p>
                         <p>
-                            Thank you for visiting our blog. We hope you find the information you're looking for and that it
-                            helps you on your journey to becoming a better web developer, designer, or technologist. If you have
-                            any questions or feedback, feel free to reach out to us. We're always happy to hear from our
-                            readers!
+                            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Excepturi eos eius odio molestiae numquam, eaque quia veniam rem! Velit perferendis, ad, aspernatur ratione, repellat culpa nesciunt obcaecati placeat ullam possimus reprehenderit quam nemo eum voluptas nam blanditiis? Vel quis explicabo reprehenderit nobis ipsum quae temporibus, eaque, doloremque possimus architecto asperiores!
                         </p>
                     </div>
                 </article>

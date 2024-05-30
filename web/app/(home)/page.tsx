@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Metadata } from "next"
+import Image from "next/image"
 
 export const metadata: Metadata = {
     title: `${process.env.NEXT_PUBLIC_APP_NAME} - Home`,
@@ -26,7 +27,7 @@ export default function HomePage() {
                     <Link className="absolute inset-0 z-10" href="#">
                         <span className="sr-only">View</span>
                     </Link>
-                    <img
+                    <Image
                         alt="Product 1"
                         className="object-cover w-full h-64"
                         height={400}
@@ -54,7 +55,7 @@ export default function HomePage() {
                     <Link className="absolute inset-0 z-10" href="#">
                         <span className="sr-only">View</span>
                     </Link>
-                    <img
+                    <Image
                         alt="Product 1"
                         className="object-cover w-full h-64"
                         height={400}
@@ -82,7 +83,7 @@ export default function HomePage() {
                     <Link className="absolute inset-0 z-10" href="#">
                         <span className="sr-only">View</span>
                     </Link>
-                    <img
+                    <Image
                         alt="Product 1"
                         className="object-cover w-full h-64"
                         height={400}

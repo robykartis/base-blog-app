@@ -12,8 +12,7 @@ export default function ContactPage() {
                     <div className="space-y-4">
                         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">Contact Us</h1>
                         <p>
-                            We'd love to hear from you! Whether you have a question, a comment, or just want to say hello, feel
-                            free to reach out to us using the form below.
+                            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque modi eos dolore. Qui recusandae repellendus possimus molestiae labore a maiores, quis dicta. At ratione mollitia obcaecati sunt! Et, praesentium. Explicabo, expedita provident. Ipsa amet ex autem nostrum obcaecati mollitia eius explicabo id et! Accusamus tenetur ratione necessitatibus officia sequi at?
                         </p>
                         <form className="space-y-4">
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

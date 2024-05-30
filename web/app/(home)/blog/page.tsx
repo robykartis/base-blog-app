@@ -1,3 +1,4 @@
+import Image from "next/image"
 import Link from "next/link"
 
 export default function BlogPage() {
@@ -9,7 +10,7 @@ export default function BlogPage() {
                         <Link className="absolute inset-0 z-10" href="#">
                             <span className="sr-only">View</span>
                         </Link>
-                        <img
+                        <Image
                             alt="Product 1"
                             className="object-cover w-full h-64"
                             height={400}

@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { SearchIcon } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
@@ -34,7 +35,7 @@ const CategoryBlog = () => {
                         <h3 className="text-xl font-bold mb-4">Popular Posts</h3>
                         <div className="space-y-4">
                             <div className="flex items-center space-x-4">
-                                <img
+                                <Image
                                     alt="Popular Post Image"
                                     className="rounded-md"
                                     height={80}
@@ -53,7 +54,7 @@ const CategoryBlog = () => {
                                 </div>
                             </div>
                             <div className="flex items-center space-x-4">
-                                <img
+                                <Image
                                     alt="Popular Post Image"
                                     className="rounded-md"
                                     height={80}
